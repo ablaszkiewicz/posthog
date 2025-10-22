@@ -1,0 +1,30 @@
+name: Upload source maps
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  build-and-upload-sourcemaps:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image with source maps
+        env:
+          POSTHOG_TOKEN: ${{ secrets.POSTHOG_CLI_TOKEN }}
+        run: |
+          docker buildx build \
+            --target frontend-build \
+            --secret id=posthog_token,env=POSTHOG_TOKEN \
+            --build-arg POSTHOG_ENV_ID=2 \
+            -f Dockerfile \
+            .
+

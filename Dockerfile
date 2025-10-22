@@ -53,7 +53,7 @@ RUN --mount=type=secret,id=posthog_token \
     export PATH="/root/.posthog:$PATH" && \
     export POSTHOG_CLI_TOKEN="$(cat /run/secrets/posthog_token)" && \
     export POSTHOG_CLI_ENV_ID="$POSTHOG_ENV_ID" && \
-    posthog-cli sourcemap process --directory /code/frontend/dist --project posthog-frontend --version 0.0.2 --batch-size 5; \
+    posthog-cli sourcemap process --directory /code/frontend/dist --project posthog-frontend --version 0.0.2; \
 fi
 
 # #

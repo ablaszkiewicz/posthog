@@ -37,22 +37,22 @@ RUN echo "=== Git repository info ===" && \
     echo "Commit:" && (cat .git/refs/heads/master || cat .git/refs/heads/main || echo "No master/main branch") && \
     echo "=== End git info ==="
 
-# COPY turbo.json package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json ./
-# COPY frontend/package.json frontend/
-# COPY frontend/bin/ frontend/bin/
-# COPY bin/ bin/
-# COPY patches/ patches/
-# COPY common/hogvm/typescript/ common/hogvm/typescript/
-# COPY common/esbuilder/ common/esbuilder/
-# COPY common/tailwind/ common/tailwind/
-# COPY products/ products/
-# COPY ee/frontend/ ee/frontend/
-# RUN --mount=type=cache,id=pnpm,target=/tmp/pnpm-store-v23 \
-#     corepack enable && pnpm --version && \
-#     pnpm --filter=@posthog/frontend... install --frozen-lockfile --store-dir /tmp/pnpm-store-v23
+COPY turbo.json package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json ./
+COPY frontend/package.json frontend/
+COPY frontend/bin/ frontend/bin/
+COPY bin/ bin/
+COPY patches/ patches/
+COPY common/hogvm/typescript/ common/hogvm/typescript/
+COPY common/esbuilder/ common/esbuilder/
+COPY common/tailwind/ common/tailwind/
+COPY products/ products/
+COPY ee/frontend/ ee/frontend/
+RUN --mount=type=cache,id=pnpm,target=/tmp/pnpm-store-v23 \
+    corepack enable && pnpm --version && \
+    pnpm --filter=@posthog/frontend... install --frozen-lockfile --store-dir /tmp/pnpm-store-v23
 
-# COPY frontend/ frontend/
-# RUN bin/turbo --filter=@posthog/frontend build
+COPY frontend/ frontend/
+RUN bin/turbo --filter=@posthog/frontend build
 
 # Process sourcemaps with PostHog CLI
 ARG POSTHOG_ENV_ID=2

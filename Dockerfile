@@ -25,22 +25,34 @@ FROM node:22.17.1-bookworm-slim AS frontend-build
 WORKDIR /code
 SHELL ["/bin/bash", "-e", "-o", "pipefail", "-c"]
 
-COPY turbo.json package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json ./
-COPY frontend/package.json frontend/
-COPY frontend/bin/ frontend/bin/
-COPY bin/ bin/
-COPY patches/ patches/
-COPY common/hogvm/typescript/ common/hogvm/typescript/
-COPY common/esbuilder/ common/esbuilder/
-COPY common/tailwind/ common/tailwind/
-COPY products/ products/
-COPY ee/frontend/ ee/frontend/
-RUN --mount=type=cache,id=pnpm,target=/tmp/pnpm-store-v23 \
-    corepack enable && pnpm --version && \
-    pnpm --filter=@posthog/frontend... install --frozen-lockfile --store-dir /tmp/pnpm-store-v23
+# Copy minimal git metadata
+COPY .git/config .git/config
+COPY .git/HEAD .git/HEAD
+COPY .git/refs/heads .git/refs/heads
 
-COPY frontend/ frontend/
-RUN bin/turbo --filter=@posthog/frontend build
+# Test if git context is available
+RUN echo "=== Git repository info ===" && \
+    echo "Remote URL:" && (grep "url = " .git/config | head -1 | sed 's/.*url = //') && \
+    echo "HEAD:" && cat .git/HEAD && \
+    echo "Commit:" && (cat .git/refs/heads/master || cat .git/refs/heads/main || echo "No master/main branch") && \
+    echo "=== End git info ==="
+
+# COPY turbo.json package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.json ./
+# COPY frontend/package.json frontend/
+# COPY frontend/bin/ frontend/bin/
+# COPY bin/ bin/
+# COPY patches/ patches/
+# COPY common/hogvm/typescript/ common/hogvm/typescript/
+# COPY common/esbuilder/ common/esbuilder/
+# COPY common/tailwind/ common/tailwind/
+# COPY products/ products/
+# COPY ee/frontend/ ee/frontend/
+# RUN --mount=type=cache,id=pnpm,target=/tmp/pnpm-store-v23 \
+#     corepack enable && pnpm --version && \
+#     pnpm --filter=@posthog/frontend... install --frozen-lockfile --store-dir /tmp/pnpm-store-v23
+
+# COPY frontend/ frontend/
+# RUN bin/turbo --filter=@posthog/frontend build
 
 # Process sourcemaps with PostHog CLI
 ARG POSTHOG_ENV_ID=2
@@ -53,7 +65,7 @@ RUN --mount=type=secret,id=posthog_token \
     export PATH="/root/.posthog:$PATH" && \
     export POSTHOG_CLI_TOKEN="$(cat /run/secrets/posthog_token)" && \
     export POSTHOG_CLI_ENV_ID="$POSTHOG_ENV_ID" && \
-    posthog-cli sourcemap process --directory /code/frontend/dist --project posthog-frontend --version 0.0.2; \
+    posthog-cli sourcemap process --directory /code/frontend/dist --project posthog-frontend --version 0.0.2 --public-path-prefix /static; \
 fi
 
 # #

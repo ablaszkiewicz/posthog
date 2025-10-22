@@ -1,6 +1,9 @@
 *
 !.devcontainer
 !.kearc
+!.git/config
+!.git/HEAD
+!.git/refs
 !bin
 !common/hogvm
 !common/esbuilder

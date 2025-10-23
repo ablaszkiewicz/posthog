@@ -36,7 +36,6 @@ jobs:
         with:
             buildx-fallback: false
             push: true
-            tags: ablaszkiewicz/posthog
             platforms: linux/arm64,linux/amd64
             build-args: COMMIT_HASH=${{ github.sha }}
 

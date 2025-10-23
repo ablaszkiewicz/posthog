@@ -3,7 +3,7 @@ name: Upload source maps
 on:
   push:
     branches:
-      - master
+      - test
   workflow_dispatch:
 
 jobs:

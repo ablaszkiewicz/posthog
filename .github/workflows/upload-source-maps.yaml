@@ -9,11 +9,9 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    # Permissions to use OIDC token authentication
     permissions:
       contents: read
       id-token: write
-      # Allows pushing to the GitHub Container Registry
       packages: write
     steps:
       - name: Check out
@@ -32,8 +30,9 @@ jobs:
 
       - name: Build and push container image
         id: build
-        uses: depot/build-push-action@2583627a84956d07561420dcc1d0eb1f2af3fac0 
+        uses: depot/build-push-action@v1
         with:
+            project: vgzrdx3nkk
             buildx-fallback: false
             push: false
             platforms: linux/arm64,linux/amd64

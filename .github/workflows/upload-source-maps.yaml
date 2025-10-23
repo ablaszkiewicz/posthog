@@ -35,7 +35,7 @@ jobs:
         uses: depot/build-push-action@2583627a84956d07561420dcc1d0eb1f2af3fac0 
         with:
             buildx-fallback: false
-            push: true
+            push: false
             platforms: linux/arm64,linux/amd64
             build-args: COMMIT_HASH=${{ github.sha }}
 
